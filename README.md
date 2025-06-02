@@ -4,6 +4,10 @@
 🎲 **Kniraffel** ist ein Multiplayer-Würfelspiel mit modernen Features, coolem UI und Firebase-Integration. Es bietet Standard- und erweiterten Modus, Münzsystem, Highscores und Rematch-Funktionalität.
 
 ---
+**Jetzt im App Store verfügbar!**  
+👉 [Hier klicken, um die App herunterzuladen](https://apps.apple.com/de/app/kniraffel/id6746126607?l=en-GB)
+
+---
 
 ##  Features
 
