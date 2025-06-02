@@ -5,22 +5,22 @@
 
 ---
 
-## 📦 Features
+##  Features
 
-✅ Apple Login mit Firestore-Integration  
-✅ Benutzerprofil mit Statistiken, Score-Historie und Diagrammen  
-✅ Lobby-System: Host kann Spielmodus („Standard“ / „Erweitert“) und Einsatz (Münzen) festlegen  
-✅ Echtzeit-Chat im Spiel  
-✅ Münz-Belohnungen und Einsätze, automatische Verteilung  
-✅ Würfelsounds, Button-Sounds, Hintergrundmusik (abschaltbar)  
-✅ Rematch-Funktion nach Spielende  
-✅ Highscore-Listen (global & benutzerspezifisch)  
-✅ Skins für Würfel (Shop-Support vorbereitet)  
-✅ Version-Check für verpflichtende App-Updates
+- Apple Login mit Firestore-Integration  
+- Benutzerprofil mit Statistiken, Score-Historie und Diagrammen  
+- Lobby-System: Host kann Spielmodus („Standard“ / „Erweitert“) und Einsatz (Münzen) festlegen  
+- Echtzeit-Chat im Spiel  
+- Münz-Belohnungen und Einsätze, automatische Verteilung  
+- Würfelsounds, Button-Sounds, Hintergrundmusik (abschaltbar)  
+- Rematch-Funktion nach Spielende  
+- Highscore-Listen (global & benutzerspezifisch)  
+- Skins für Würfel (Shop-Support vorbereitet)  
+- Version-Check für verpflichtende App-Updates
 
 ---
 
-## 🚀 Installation
+## Installation
 
 1. **Voraussetzungen:**
    - Xcode (min. 14)
@@ -35,7 +35,7 @@
 
 ---
 
-## 🏗 Projektstruktur
+## Projektstruktur
 
 | Datei                      | Funktion                                             |
 |----------------------------|------------------------------------------------------|
@@ -53,7 +53,7 @@
 
 ---
 
-## 🔑 Spielmodi
+##  Spielmodi
 
 - **Standard**:
   - 5 Würfel, klassische Regeln
@@ -66,7 +66,7 @@
 
 ---
 
-## 💰 Münzsystem
+## Münzsystem
 
 - Spieler sammeln Münzen durch Siege & hohe Scores
 - Host kann Einsatz pro Spieler setzen (Coins werden automatisch abgezogen und an den Gewinner ausgeschüttet)
@@ -74,7 +74,7 @@
 
 ---
 
-## 📊 Statistik & Highscores
+## Statistik & Highscores
 
 - Globale Top-5-Ranglisten (Standard / Erweitert)
 - Pro-User-Toplisten (Ø Punkte pro Spiel)
@@ -82,7 +82,7 @@
 
 ---
 
-## ⚙️ Wichtige technische Details
+## Wichtige technische Details
 
 - Echtzeit-Updates über Firestore Snapshots
 - Soundsteuerung über `UserDefaults` (z. B. Hintergrundmusik)
@@ -92,7 +92,7 @@
 
 ---
 
-## 🛡 ToDo / Ideen für die Zukunft
+##  ToDo / Ideen für die Zukunft
 
 - In-App Purchases für Münzen oder Skins
 - Push Notifications für Freundeseinladungen
