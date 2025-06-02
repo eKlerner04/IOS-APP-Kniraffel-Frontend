@@ -15,7 +15,8 @@
 - Benutzerprofil mit Statistiken, Score-Historie und Diagrammen  
 - Lobby-System: Host kann Spielmodus („Standard“ / „Erweitert“) und Einsatz (Münzen) festlegen  
 - Echtzeit-Chat im Spiel  
-- Münz-Belohnungen und Einsätze, automatische Verteilung  
+- Münz-Belohnungen und Einsätze, automatische Verteilung
+- Shop mit Skins für Würfel, die man mit erspielten Ingame-Münzen kaufen kann
 - Würfelsounds, Button-Sounds, Hintergrundmusik (abschaltbar)  
 - Rematch-Funktion nach Spielende  
 - Highscore-Listen (global & benutzerspezifisch)  
@@ -70,11 +71,13 @@
 
 ---
 
-## Münzsystem
+##  Münzsystem & Shop
 
 - Spieler sammeln Münzen durch Siege & hohe Scores
 - Host kann Einsatz pro Spieler setzen (Coins werden automatisch abgezogen und an den Gewinner ausgeschüttet)
+- Mit erspielten Münzen können im Shop neue Würfelskins gekauft werden
 - Highscores und Ranglisten zeigen Punkte (nicht Coins)
+
 
 ---
 
