@@ -1,4 +1,4 @@
-readme_content = """
+
 # 🦒 Kniraffel – README
 
 🎲 **Kniraffel** ist ein Multiplayer-Würfelspiel mit modernen Features, coolem UI und Firebase-Integration. Es bietet Standard- und erweiterten Modus, Münzsystem, Highscores und Rematch-Funktionalität.
@@ -99,4 +99,4 @@ readme_content = """
 - Mehr Würfelskins und personalisierte Spielfelder
 - Tägliche Challenges mit Münzbelohnungen
 - Web- oder Desktop-Version
-"""
+
