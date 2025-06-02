@@ -1,0 +1,655 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D640ADCF2DD7CEC200FE30C4 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = D640ADCE2DD7CEC200FE30C4 /* FirebaseCore */; };
+		D640ADD12DD7CEC200FE30C4 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = D640ADD02DD7CEC200FE30C4 /* FirebaseFirestore */; };
+		D6B350362DE4A5E2004FD94E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = D6B350352DE4A5E2004FD94E /* FirebaseAuth */; };
+		D6BB326D2DD806190071315E /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = D6BB326C2DD806190071315E /* FirebaseFirestoreCombine-Community */; };
+		D6BB326F2DD808B20071315E /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = D6BB326E2DD808B20071315E /* FirebaseFunctions */; };
+		D6BB32712DD808B20071315E /* FirebaseFunctionsCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = D6BB32702DD808B20071315E /* FirebaseFunctionsCombine-Community */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D640ADAF2DD7CA6500FE30C4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D640AD992DD7CA6200FE30C4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D640ADA02DD7CA6200FE30C4;
+			remoteInfo = KnubbelGame;
+		};
+		D640ADB92DD7CA6500FE30C4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D640AD992DD7CA6200FE30C4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D640ADA02DD7CA6200FE30C4;
+			remoteInfo = KnubbelGame;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		D640ADA12DD7CA6200FE30C4 /* Kniraffel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kniraffel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D640ADAE2DD7CA6500FE30C4 /* KniraffelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KniraffelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D640ADB82DD7CA6500FE30C4 /* KniraffelUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KniraffelUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6B3502B2DE4981B004FD94E /* Kniraffel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Kniraffel.entitlements; sourceTree = "<group>"; };
+		D6C4C4B12DE0857600A7A25D /* Kniraffel-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Kniraffel-Info.plist"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		D640ADA32DD7CA6200FE30C4 /* KnubbelGame */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KnubbelGame;
+			sourceTree = "<group>";
+		};
+		D640ADB12DD7CA6500FE30C4 /* KnubbelGameTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KnubbelGameTests;
+			sourceTree = "<group>";
+		};
+		D640ADBB2DD7CA6500FE30C4 /* KnubbelGameUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KnubbelGameUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D640AD9E2DD7CA6200FE30C4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D6BB326D2DD806190071315E /* FirebaseFirestoreCombine-Community in Frameworks */,
+				D6B350362DE4A5E2004FD94E /* FirebaseAuth in Frameworks */,
+				D640ADCF2DD7CEC200FE30C4 /* FirebaseCore in Frameworks */,
+				D640ADD12DD7CEC200FE30C4 /* FirebaseFirestore in Frameworks */,
+				D6BB32712DD808B20071315E /* FirebaseFunctionsCombine-Community in Frameworks */,
+				D6BB326F2DD808B20071315E /* FirebaseFunctions in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D640ADAB2DD7CA6500FE30C4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D640ADB52DD7CA6500FE30C4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D640AD982DD7CA6200FE30C4 = {
+			isa = PBXGroup;
+			children = (
+				D6B3502B2DE4981B004FD94E /* Kniraffel.entitlements */,
+				D6C4C4B12DE0857600A7A25D /* Kniraffel-Info.plist */,
+				D640ADA32DD7CA6200FE30C4 /* KnubbelGame */,
+				D640ADB12DD7CA6500FE30C4 /* KnubbelGameTests */,
+				D640ADBB2DD7CA6500FE30C4 /* KnubbelGameUITests */,
+				D640ADA22DD7CA6200FE30C4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D640ADA22DD7CA6200FE30C4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D640ADA12DD7CA6200FE30C4 /* Kniraffel.app */,
+				D640ADAE2DD7CA6500FE30C4 /* KniraffelTests.xctest */,
+				D640ADB82DD7CA6500FE30C4 /* KniraffelUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D640ADA02DD7CA6200FE30C4 /* Kniraffel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D640ADC22DD7CA6500FE30C4 /* Build configuration list for PBXNativeTarget "Kniraffel" */;
+			buildPhases = (
+				D640AD9D2DD7CA6200FE30C4 /* Sources */,
+				D640AD9E2DD7CA6200FE30C4 /* Frameworks */,
+				D640AD9F2DD7CA6200FE30C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D640ADA32DD7CA6200FE30C4 /* KnubbelGame */,
+			);
+			name = Kniraffel;
+			packageProductDependencies = (
+				D640ADCE2DD7CEC200FE30C4 /* FirebaseCore */,
+				D640ADD02DD7CEC200FE30C4 /* FirebaseFirestore */,
+				D6BB326C2DD806190071315E /* FirebaseFirestoreCombine-Community */,
+				D6BB326E2DD808B20071315E /* FirebaseFunctions */,
+				D6BB32702DD808B20071315E /* FirebaseFunctionsCombine-Community */,
+				D6B350352DE4A5E2004FD94E /* FirebaseAuth */,
+			);
+			productName = KnubbelGame;
+			productReference = D640ADA12DD7CA6200FE30C4 /* Kniraffel.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D640ADAD2DD7CA6500FE30C4 /* KniraffelTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D640ADC52DD7CA6500FE30C4 /* Build configuration list for PBXNativeTarget "KniraffelTests" */;
+			buildPhases = (
+				D640ADAA2DD7CA6500FE30C4 /* Sources */,
+				D640ADAB2DD7CA6500FE30C4 /* Frameworks */,
+				D640ADAC2DD7CA6500FE30C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D640ADB02DD7CA6500FE30C4 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D640ADB12DD7CA6500FE30C4 /* KnubbelGameTests */,
+			);
+			name = KniraffelTests;
+			packageProductDependencies = (
+			);
+			productName = KnubbelGameTests;
+			productReference = D640ADAE2DD7CA6500FE30C4 /* KniraffelTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D640ADB72DD7CA6500FE30C4 /* KniraffelUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D640ADC82DD7CA6500FE30C4 /* Build configuration list for PBXNativeTarget "KniraffelUITests" */;
+			buildPhases = (
+				D640ADB42DD7CA6500FE30C4 /* Sources */,
+				D640ADB52DD7CA6500FE30C4 /* Frameworks */,
+				D640ADB62DD7CA6500FE30C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D640ADBA2DD7CA6500FE30C4 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D640ADBB2DD7CA6500FE30C4 /* KnubbelGameUITests */,
+			);
+			name = KniraffelUITests;
+			packageProductDependencies = (
+			);
+			productName = KnubbelGameUITests;
+			productReference = D640ADB82DD7CA6500FE30C4 /* KniraffelUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D640AD992DD7CA6200FE30C4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1630;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+					D640ADA02DD7CA6200FE30C4 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					D640ADAD2DD7CA6500FE30C4 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = D640ADA02DD7CA6200FE30C4;
+					};
+					D640ADB72DD7CA6500FE30C4 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = D640ADA02DD7CA6200FE30C4;
+					};
+				};
+			};
+			buildConfigurationList = D640AD9C2DD7CA6200FE30C4 /* Build configuration list for PBXProject "Kniraffel" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D640AD982DD7CA6200FE30C4;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D640ADCD2DD7CEC200FE30C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D640ADA22DD7CA6200FE30C4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D640ADA02DD7CA6200FE30C4 /* Kniraffel */,
+				D640ADAD2DD7CA6500FE30C4 /* KniraffelTests */,
+				D640ADB72DD7CA6500FE30C4 /* KniraffelUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D640AD9F2DD7CA6200FE30C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D640ADAC2DD7CA6500FE30C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D640ADB62DD7CA6500FE30C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D640AD9D2DD7CA6200FE30C4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D640ADAA2DD7CA6500FE30C4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D640ADB42DD7CA6500FE30C4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D640ADB02DD7CA6500FE30C4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D640ADA02DD7CA6200FE30C4 /* Kniraffel */;
+			targetProxy = D640ADAF2DD7CA6500FE30C4 /* PBXContainerItemProxy */;
+		};
+		D640ADBA2DD7CA6500FE30C4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D640ADA02DD7CA6200FE30C4 /* Kniraffel */;
+			targetProxy = D640ADB92DD7CA6500FE30C4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		D640ADC02DD7CA6500FE30C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "";
+				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
+				PRODUCT_NAME = "";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D640ADC12DD7CA6500FE30C4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "";
+				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
+				PRODUCT_NAME = "";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D640ADC32DD7CA6500FE30C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Kniraffel.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 9;
+				DEVELOPMENT_TEAM = 2ZQZBPA53C;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Kniraffel-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = walletApp.KnubbelGame;
+				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				s = s;
+			};
+			name = Debug;
+		};
+		D640ADC42DD7CA6500FE30C4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Kniraffel.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 9;
+				DEVELOPMENT_TEAM = 2ZQZBPA53C;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Kniraffel-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = walletApp.KnubbelGame;
+				PRODUCT_MODULE_NAME = "$(PRODUCT_NAME:c99extidentifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				s = s;
+			};
+			name = Release;
+		};
+		D640ADC62DD7CA6500FE30C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = walletApp.KnubbelGameTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Kniraffel.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Kniraffel";
+			};
+			name = Debug;
+		};
+		D640ADC72DD7CA6500FE30C4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = walletApp.KnubbelGameTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Kniraffel.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Kniraffel";
+			};
+			name = Release;
+		};
+		D640ADC92DD7CA6500FE30C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = walletApp.KnubbelGameUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KnubbelGame;
+			};
+			name = Debug;
+		};
+		D640ADCA2DD7CA6500FE30C4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = walletApp.KnubbelGameUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KnubbelGame;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D640AD9C2DD7CA6200FE30C4 /* Build configuration list for PBXProject "Kniraffel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D640ADC02DD7CA6500FE30C4 /* Debug */,
+				D640ADC12DD7CA6500FE30C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D640ADC22DD7CA6500FE30C4 /* Build configuration list for PBXNativeTarget "Kniraffel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D640ADC32DD7CA6500FE30C4 /* Debug */,
+				D640ADC42DD7CA6500FE30C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D640ADC52DD7CA6500FE30C4 /* Build configuration list for PBXNativeTarget "KniraffelTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D640ADC62DD7CA6500FE30C4 /* Debug */,
+				D640ADC72DD7CA6500FE30C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D640ADC82DD7CA6500FE30C4 /* Build configuration list for PBXNativeTarget "KniraffelUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D640ADC92DD7CA6500FE30C4 /* Debug */,
+				D640ADCA2DD7CA6500FE30C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D640ADCD2DD7CEC200FE30C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D640ADCE2DD7CEC200FE30C4 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D640ADCD2DD7CEC200FE30C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		D640ADD02DD7CEC200FE30C4 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D640ADCD2DD7CEC200FE30C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		D6B350352DE4A5E2004FD94E /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D640ADCD2DD7CEC200FE30C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		D6BB326C2DD806190071315E /* FirebaseFirestoreCombine-Community */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D640ADCD2DD7CEC200FE30C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseFirestoreCombine-Community";
+		};
+		D6BB326E2DD808B20071315E /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D640ADCD2DD7CEC200FE30C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
+		D6BB32702DD808B20071315E /* FirebaseFunctionsCombine-Community */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D640ADCD2DD7CEC200FE30C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseFunctionsCombine-Community";
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D640AD992DD7CA6200FE30C4 /* Project object */;
+}
