@@ -18,8 +18,21 @@ struct LobbyView: View {
     @State private var countdown: Int? = nil
     @State private var countdownTimer: Timer? = nil
 
+    @Environment(\.colorScheme) var colorScheme
+
+    var backgroundColor: Color {
+        colorScheme == .dark ? Color.black : Color.white
+    }
+
+    var foregroundColor: Color {
+        colorScheme == .dark ? Color.white : Color.black
+    }
+
     var body: some View {
         ZStack {
+            backgroundColor
+                .ignoresSafeArea()
+
             VStack(spacing: 20) {
                 Spacer(minLength: 30)
 
@@ -29,14 +42,14 @@ struct LobbyView: View {
                         coinInfoSection
 
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.white.opacity(0.15))
+                            .fill(foregroundColor.opacity(0.1))
                             .overlay(
                                 VStack(spacing: 12) {
                                     modeSection(for: game)
-                                    Divider().background(Color.black.opacity(0.4))
+                                    Divider().background(foregroundColor.opacity(0.4))
                                     Text("Spieler (\(game.players.count))")
                                         .font(.subheadline)
-                                        .foregroundColor(.black.opacity(0.9))
+                                        .foregroundColor(foregroundColor)
                                     playersList(for: game)
                                 }
                                 .padding()
@@ -52,8 +65,8 @@ struct LobbyView: View {
                                 .font(.subheadline)
                                 .padding(.vertical, 8)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.black.opacity(0.1))
-                                .foregroundColor(.black)
+                                .background(foregroundColor.opacity(0.1))
+                                .foregroundColor(foregroundColor)
                                 .cornerRadius(10)
                         }
                         .frame(maxWidth: 250)
@@ -61,7 +74,7 @@ struct LobbyView: View {
                     .padding(.horizontal)
                 } else {
                     ProgressView("Lade Lobby...")
-                        .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                        .progressViewStyle(CircularProgressViewStyle(tint: foregroundColor))
                 }
 
                 Spacer()
@@ -92,7 +105,6 @@ struct LobbyView: View {
                 }
             }
         }
-
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -102,14 +114,14 @@ struct LobbyView: View {
                     dismiss()
                 }) {
                     Label("Zurück", systemImage: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(foregroundColor)
                 }
             }
 
             ToolbarItem(placement: .principal) {
                 Text("LOBBY")
                     .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(.black)
+                    .foregroundColor(foregroundColor)
             }
         }
         .sheet(isPresented: $showModusSheet) {
@@ -118,13 +130,11 @@ struct LobbyView: View {
         }
     }
 
-    // MARK: - Sections
-
     var headerSection: some View {
         VStack {
             Text("CODE: \(firestore.currentGame?.id?.uppercased() ?? "UNBEKANNT")")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundColor(.black)
+                .foregroundColor(foregroundColor)
                 .padding(.top, 8)
 
             Button {
@@ -134,169 +144,166 @@ struct LobbyView: View {
             } label: {
                 Label("Code kopieren", systemImage: "doc.on.doc")
                     .font(.subheadline)
-                    .foregroundColor(.black)
+                    .foregroundColor(foregroundColor)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.black.opacity(0.1))
+                    .background(foregroundColor.opacity(0.1))
                     .cornerRadius(8)
             }
         }
     }
 
     var coinInfoSection: some View {
-        if let userId = UserDefaults.standard.string(forKey: "userIdentifier") {
-            return AnyView(
-                Text("🏦 Deine Münzen: **\(currentCoins)**")
-                    .foregroundColor(.black)
-                    .font(.subheadline)
-                    .onAppear {
-                        loadCurrentCoins(for: userId)
-                    }
-            )
-        } else {
-            return AnyView(EmptyView())
+            if let userId = UserDefaults.standard.string(forKey: "userIdentifier") {
+                return AnyView(
+                    Text("🏦 Deine Münzen: **\(currentCoins)**")
+                        .foregroundColor(foregroundColor)
+                        .font(.subheadline)
+                        .onAppear {
+                            loadCurrentCoins(for: userId)
+                        }
+                )
+            } else {
+                return AnyView(EmptyView())
+            }
         }
-    }
 
-    func modeSection(for game: GameSession) -> some View {
-        VStack(spacing: 4) {
-            Text("🔧 Gespielt wird: **\(angezeigterModus.capitalized)**")
-                .foregroundColor(.black)
-                .font(.subheadline)
-
-            if let einsatz = game.einsatzCoins {
-                Text("💰 Einsatz pro Spieler: **\(einsatz)** Münzen")
-                    .foregroundColor(.black)
+        func modeSection(for game: GameSession) -> some View {
+            VStack(spacing: 4) {
+                Text("🔧 Gespielt wird: **\(angezeigterModus.capitalized)**")
+                    .foregroundColor(foregroundColor)
                     .font(.subheadline)
 
-                let pot = einsatz * (game.players.count)
-                Text("🏆 Aktueller Pot: **\(pot)** Münzen")
-                    .foregroundColor(.black)
-                    .font(.subheadline)
+                if let einsatz = game.einsatzCoins {
+                    Text("💰 Einsatz pro Spieler: **\(einsatz)** Münzen")
+                        .foregroundColor(foregroundColor)
+                        .font(.subheadline)
 
-                if let einsatzCheckMessage = einsatzCheckMessage {
-                    Text(einsatzCheckMessage)
-                        .font(.footnote)
-                        .foregroundColor(einsatzCheckSuccess ? .green : .red)
+                    let pot = einsatz * (game.players.count)
+                    Text("🏆 Aktueller Pot: **\(pot)** Münzen")
+                        .foregroundColor(foregroundColor)
+                        .font(.subheadline)
+
+                    if let einsatzCheckMessage = einsatzCheckMessage {
+                        Text(einsatzCheckMessage)
+                            .font(.footnote)
+                            .foregroundColor(einsatzCheckSuccess ? .green : .red)
+                    }
                 }
             }
         }
-    }
 
-    func playersList(for game: GameSession) -> some View {
-        VStack(spacing: 12) {
-            let readyCount = Double(game.ready?.filter { $0.value == true }.count ?? 0)
-            let totalCount = max(Double(game.players.count), 1)
+        func playersList(for game: GameSession) -> some View {
+            VStack(spacing: 12) {
+                let readyCount = Double(game.ready?.filter { $0.value == true }.count ?? 0)
+                let totalCount = max(Double(game.players.count), 1)
 
-            Text("✅ Bereit: \(Int(readyCount)) / \(Int(totalCount))")
-                .font(.headline)
-                .foregroundColor(.blue)
+                Text("✅ Bereit: \(Int(readyCount)) / \(Int(totalCount))")
+                    .font(.headline)
+                    .foregroundColor(.blue)
 
-            ProgressView(value: readyCount, total: totalCount)
-                .progressViewStyle(LinearProgressViewStyle(tint: .green))
-                .scaleEffect(x: 1, y: 2, anchor: .center)
-                .padding(.horizontal)
+                ProgressView(value: readyCount, total: totalCount)
+                    .progressViewStyle(LinearProgressViewStyle(tint: .green))
+                    .scaleEffect(x: 1, y: 2, anchor: .center)
+                    .padding(.horizontal)
 
-            ForEach(game.players, id: \.self) { player in
-                HStack {
-                    Image(systemName: "person.fill")
-                        .foregroundColor(.black)
-                    Text(player)
-                        .foregroundColor(.black)
-                        .bold()
+                ForEach(game.players, id: \.self) { player in
+                    HStack {
+                        Image(systemName: "person.fill")
+                            .foregroundColor(foregroundColor)
+                        Text(player)
+                            .foregroundColor(foregroundColor)
+                            .bold()
 
-                    Spacer()
+                        Spacer()
 
-                    if let readyDict = game.ready, readyDict[player] == true {
-                        Text("✅")
-                            .font(.title2)
-                            .foregroundColor(.green)
-                    } else {
-                        Text("❌")
-                            .font(.title2)
-                            .foregroundColor(.red)
+                        if let readyDict = game.ready, readyDict[player] == true {
+                            Text("✅")
+                                .font(.title2)
+                                .foregroundColor(.green)
+                        } else {
+                            Text("❌")
+                                .font(.title2)
+                                .foregroundColor(.red)
+                        }
                     }
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
             }
         }
-    }
-
 
 
     func startButtonSection(for game: GameSession) -> some View {
-        let allReady = game.players.allSatisfy { game.ready?[$0] == true }
+            let allReady = game.players.allSatisfy { game.ready?[$0] == true }
 
-        return VStack(spacing: 10) {
-            if !game.started {
-                if let countdown = countdown {
-                    Text("🎉 Alle bereit! Start in \(countdown)...")
-                        .foregroundColor(.green)
-                        .font(.headline)
-                } else if allReady {
-                    Text("🎉 Alle Spieler bereit!")
-                        .foregroundColor(.green)
-                        .font(.headline)
-                } else {
-                    Text("⚠️ Warte, bis alle Spieler bereit sind...")
-                        .foregroundColor(.orange)
-                }
-
-                Button(action: {
-                    withAnimation(.spring()) {
-                        isReady.toggle()
-                        firestore.setPlayerReady(playerName: playerName, ready: isReady)
-                        if isReady {
-                            if allReady {
-                                startCountdown(for: game)
-                            }
-                        } else {
-                            cancelCountdown()
-                        }
-                    }
-                }) {
-                    HStack {
-                        Image(systemName: isReady ? "xmark.circle.fill" : "checkmark.circle.fill")
-                        Text(isReady ? "Zurücknehmen" : "Bereit")
+            return VStack(spacing: 10) {
+                if !game.started {
+                    if let countdown = countdown {
+                        Text("🎉 Alle bereit! Start in \(countdown)...")
+                            .foregroundColor(.green)
                             .font(.headline)
+                    } else if allReady {
+                        Text("🎉 Alle Spieler bereit!")
+                            .foregroundColor(.green)
+                            .font(.headline)
+                    } else {
+                        Text("⚠️ Warte, bis alle Spieler bereit sind...")
+                            .foregroundColor(.orange)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(isReady ? Color.red : Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+
+                    Button(action: {
+                        withAnimation(.spring()) {
+                            isReady.toggle()
+                            firestore.setPlayerReady(playerName: playerName, ready: isReady)
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: isReady ? "xmark.circle.fill" : "checkmark.circle.fill")
+                            Text(isReady ? "Zurücknehmen" : "Bereit")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(isReady ? Color.red : Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                    }
+                    .frame(maxWidth: 300)
                 }
-                .frame(maxWidth: 300)
             }
         }
-    }
 
 
 
 
     
     func startGameAutomatically(_ game: GameSession) {
+        // Nur der Host darf das Spiel starten
+        guard game.host == playerName else {
+            print("⏳ Ich bin nicht der Host – warte auf Start durch \(game.host ?? "-")")
+            return
+        }
+
         let entryFee = game.einsatzCoins ?? 0
 
-        if game.players.count == 1 || entryFee == 0 {
+        if entryFee == 0 {
             firestore.startGame()
         } else {
             firestore.checkIfAllPlayersCanPay(entryFee: entryFee) { success, message in
                 einsatzCheckMessage = message
                 einsatzCheckSuccess = success
+
                 if success {
-                    firestore.collectEntryFeeFromAllPlayers(entryFee: entryFee) { success, message in
-                        if success {
-                            firestore.startGame()
-                        } else {
-                            einsatzCheckMessage = message ?? "❌ Fehler beim Abziehen der Einsätze"
-                            einsatzCheckSuccess = false
-                        }
-                    }
+                    firestore.startGame()
+                } else {
+                    print("❌ Nicht alle Spieler können zahlen: \(message ?? "Unbekannt")")
                 }
             }
         }
     }
+
+
+
     
     func checkAndStartCountdown(game: GameSession) {
         let allReady = game.players.allSatisfy { game.ready?[$0] == true }
@@ -334,14 +341,14 @@ struct LobbyView: View {
     // MARK: - Helpers
 
     func loadCurrentCoins(for userId: String) {
-        let db = Firestore.firestore()
-        db.collection("users").document(userId).getDocument { snapshot, error in
-            if let data = snapshot?.data() {
-                self.currentCoins = data["coins"] as? Int ?? 0
-                print("💰 Aktuelle Münzen geladen: \(self.currentCoins)")
-            } else if let error = error {
-                print("❌ Fehler beim Laden der Münzen: \(error.localizedDescription)")
-            }
-        }
-    }
+           let db = Firestore.firestore()
+           db.collection("users").document(userId).getDocument { snapshot, error in
+               if let data = snapshot?.data() {
+                   self.currentCoins = data["coins"] as? Int ?? 0
+                   print("💰 Aktuelle Münzen geladen: \(self.currentCoins)")
+               } else if let error = error {
+                   print("❌ Fehler beim Laden der Münzen: \(error.localizedDescription)")
+               }
+           }
+       }
 }

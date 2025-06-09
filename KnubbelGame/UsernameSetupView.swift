@@ -51,22 +51,27 @@ struct UsernameSetupView: View {
     
     func checkAndSaveUsername() {
         let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         guard !trimmedUsername.isEmpty else {
             errorMessage = "Bitte gib einen Username ein."
             return
         }
-        
+
         guard trimmedUsername.count >= 3 else {
             errorMessage = "Der Username muss mindestens 3 Zeichen haben."
             return
         }
-        
+
+        guard trimmedUsername.lowercased() != "unbekannt" else {
+            errorMessage = "Dieser Name ist nicht erlaubt."
+            return
+        }
+
         isLoading = true
         errorMessage = ""
-        
+
         let usersRef = Firestore.firestore().collection("users")
-        
+
         usersRef.whereField("username", isEqualTo: trimmedUsername).getDocuments { snapshot, error in
             if let error = error {
                 DispatchQueue.main.async {
@@ -75,7 +80,7 @@ struct UsernameSetupView: View {
                 }
                 return
             }
-            
+
             if let docs = snapshot?.documents, !docs.isEmpty {
                 DispatchQueue.main.async {
                     self.errorMessage = "Dieser Username ist bereits vergeben."
@@ -98,4 +103,5 @@ struct UsernameSetupView: View {
             }
         }
     }
+
 }

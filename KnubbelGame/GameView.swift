@@ -12,8 +12,13 @@ struct GameView: View {
     var playerName: String
     var firestore: FirestoreManager
     @State private var animateReady = false
-
-
+    
+    @State private var coinChangeTotal: Int = 0
+    @State private var coinChangeDetails: [String] = []
+    @State private var didCloseRematchSheet = false
+    
+    
+    
     @Environment(\.dismiss) var dismiss
     @State private var showLeaveConfirmation = false
     @State private var showScoreboard = false
@@ -27,39 +32,41 @@ struct GameView: View {
     
     @State private var showCoinAlert = false
     @State private var coinAlertMessage = ""
-
-
-
-
-
+    @State private var bonusCoinsEarned: Int = 0
+    
+    
     @State private var usedCategories: Set<String> = []
     @State private var categoryScores: [String: Int] = [:]
-
+    
     @State private var activePlayer: String = ""
     @State private var playerTurnIndex: Int = 0
     @State private var totalPlayers: Int = 1
-
+    
     @State private var dice: [Int] = []
     @State private var holds: [Bool] = []
-
+    
     @State private var rollsLeft: Int = 3
     @State private var firstRollDone: Bool = false
-
+    
     @State private var winnerName: String = ""
     @State private var winnerPoints: Int = 0
-
+    
     @State private var lastMessagePreview: String? = nil
     @State private var previewTimer: Timer? = nil
-
+    
     @State private var extraModus = false
     @State private var selectedSkin: String = "skin_classic"
     @State private var rematchReadyCount: Int = 0
     @State private var isPlayerReady: Bool = false
-
-
-
-
-
+    
+    @State private var countdown: Int? = nil
+    @State private var countdownTimer: Timer? = nil
+    
+    
+    
+    
+    
+    
     let upperSection = [
         ("Nur Einser zählen", "⚀"),
         ("Nur Zweier zählen", "⚁"),
@@ -68,37 +75,37 @@ struct GameView: View {
         ("Nur Fünfer zählen", "⚄"),
         ("Nur Sechser zählen", "⚅")
     ]
-
+    
     var lowerSection: [String] {
-    var base = [
-        "Dreierpasch", "Viererpasch", "Full House",
-        "Kleine Straße", "Große Straße"
-    ]
-    if extraModus {
-        base.append(contentsOf: extendedCategories)
+        var base = [
+            "Dreierpasch", "Viererpasch", "Full House",
+            "Kleine Straße", "Große Straße"
+        ]
+        if extraModus {
+            base.append(contentsOf: extendedCategories)
+        }
+        base.append("Chance")
+        base.append("Kniraffel")
+        return base
     }
-    base.append("Chance")
-    base.append("Kniraffel")
-    return base
-}
-
+    
     let extendedCategories = [
-    "1 Paar", "2 Paare", "3 Paare", "Zwei Drillinge"
-]
-
+        "1 Paar", "2 Paare", "3 Paare", "Zwei Drillinge"
+    ]
+    
     var upperScore: Int {
         upperSection.map { categoryScores[$0.0] ?? 0 }.reduce(0, +)
     }
-
+    
     var lowerScore: Int {
         lowerSection.map { categoryScores[$0] ?? 0 }.reduce(0, +)
     }
-
+    
     var bonus: Int {
         let required = extraModus ? 84 : 63
         return upperScore >= required ? 35 : 0
     }
-
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -108,7 +115,7 @@ struct GameView: View {
                     endPoint: .bottom
                 )
                 .ignoresSafeArea()
-
+                
                 VStack(spacing: 20) {
                     headerView
                     contentView
@@ -129,19 +136,31 @@ struct GameView: View {
             }
             .alert("Match verlassen?", isPresented: $showLeaveConfirmation) {
                 Button("Ja", role: .destructive) {
-                    leaveMatch() // <-- ruft dieselbe Logik wie der Verlassen-Button auf
+                    leaveMatch()
                 }
                 Button("Nein", role: .cancel) {}
             } message: {
                 Text("Willst du das laufende Spiel wirklich verlassen?")
             }
             .onAppear(perform: setupGame)
+            .onChange(of: firestore.currentGame?.started) { started in
+                print("🔁 [onChange] started geändert: \(started?.description ?? "nil")")
+                if started == true {
+                    print("🎬 [onChange] Rematch gestartet – GameView wird neu initialisiert")
+                    setupGame()
+                    showGameOverSheet = false
+                }
+            }
+
+            
             .sheet(isPresented: $showChat) { chatSheet }
             .sheet(isPresented: $showScoreboard) { ScoreboardView(firestore: firestore) }
             .sheet(isPresented: $showDiceView) { diceRollingSheet }
             .sheet(isPresented: $showGameOverSheet) { gameOverSheet }
             
             .onAppear {
+                
+                
                 // Skin laden
                 if let userId = Auth.auth().currentUser?.uid {
                     let userRef = Firestore.firestore().collection("users").document(userId)
@@ -160,13 +179,13 @@ struct GameView: View {
             }
         }
     }
-
+    
     private var headerView: some View {
         VStack {
             Text("🎲 \(playerName) 🦒")
                 .font(.system(size: 28, weight: .bold))
                 .padding(.top, 10)
-
+            
             if activePlayer != playerName {
                 Text("⏳ Warte auf \(activePlayer)...")
                     .font(.subheadline)
@@ -177,7 +196,7 @@ struct GameView: View {
             }
         }
     }
-
+    
     private var contentView: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -196,7 +215,7 @@ struct GameView: View {
             .padding(.horizontal)
         }
     }
-
+    
     private var actionBarView: some View {
         HStack(spacing: 20) {
             Button(action: { showScoreboard = true }) { IconButton(icon: "list.bullet.rectangle") }
@@ -209,7 +228,7 @@ struct GameView: View {
         }
         .padding(.horizontal)
     }
-
+    
     private func setupGame() {
         if let gameId = firestore.currentGame?.id {
             listenForNewMessages(gameId: gameId)
@@ -224,8 +243,11 @@ struct GameView: View {
         observeActivePlayer()
         observeGameOver()
         observeRematchStatus()
+        
+        
     }
-
+    
+    
     private var chatSheet: some View {
         if let gameId = firestore.currentGame?.id {
             return AnyView(ChatView(
@@ -241,7 +263,7 @@ struct GameView: View {
             return AnyView(EmptyView())
         }
     }
-
+    
     private var diceRollingSheet: some View {
         DiceRollingView(
             playerName: playerName,
@@ -267,26 +289,44 @@ struct GameView: View {
             checkForGameEnd()
         }
     }
-
+    
     private var gameOverSheet: some View {
         let myTotal = upperScore + lowerScore + bonus
         let isHost = firestore.currentGame?.host == playerName
         let myCoins = currentCoins
         let maxAllowedEinsatz = min(myCoins, 20)
         let players = firestore.currentGame?.players ?? []
-
+        
         return VStack(spacing: 20) {
             Text("🏁 Spiel beendet").font(.largeTitle)
             Text("🏆 Gewinner: \(winnerName)").font(.title2)
-            Text("💰 Gewinn aus letztem Spiel: \(lastGameWinAmount) Münzen").bold()
+            
             Text("📊 Dein Ergebnis: \(myTotal) Punkte")
                 .font(.headline)
                 .foregroundColor(.purple)
-            Text("💼 Dein Kontostand: \(myCoins) Münzen")
-                .font(.subheadline)
-
+            
+            Text("💰 Münzbilanz: \(coinChangeTotal >= 0 ? "+" : "")\(coinChangeTotal) Münzen")
+                .font(.title3)
+                .bold()
+                .foregroundColor(coinChangeTotal >= 0 ? .green : .red)
+            
+            if bonusCoinsEarned > 0 {
+                Text("📈 Bonus: +\(bonusCoinsEarned) Münzen")
+                    .font(.subheadline)
+                    .foregroundColor(.green)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                ForEach(Array(coinChangeDetails.enumerated()), id: \.offset) { _, line in
+                    Text(line).font(.subheadline)
+                }
+            }
+            
             Divider()
-
+            
+            Text("💼 Kontostand: \(myCoins) Münzen")
+                .font(.subheadline)
+            
             if isHost {
                 Stepper("💸 Einsatz pro Spieler: \(einsatzCoins) Münzen", value: $einsatzCoins, in: 0...maxAllowedEinsatz)
                     .padding()
@@ -294,20 +334,20 @@ struct GameView: View {
                         if let gameId = firestore.currentGame?.id {
                             Firestore.firestore().collection("games").document(gameId).updateData([
                                 "einsatzCoins": newValue
-                            ]) { error in
-                                if let error = error {
-                                    print("❌ Fehler beim Aktualisieren des Einsatzes: \(error.localizedDescription)")
-                                } else {
-                                    print("✅ Einsatz wurde auf \(newValue) aktualisiert")
-                                }
-                            }
+                            ])
                         }
                     }
             } else {
                 Text("💸 Einsatz für Rematch: \(einsatzCoins) Münzen (vom Host festgelegt)")
                     .padding()
+                
+                Text("⏳ Warte auf den Host, das Rematch zu starten…")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
             }
-
+            
             if totalPlayers > 1 {
                 VStack {
                     Text("✅ Bereit: \(rematchReadyCount) / \(totalPlayers)")
@@ -321,7 +361,27 @@ struct GameView: View {
                 }
                 .padding()
             }
-
+            
+            if isHost && rematchReadyCount == totalPlayers {
+                VStack(spacing: 10) {
+                    if let countdown = self.countdown {
+                        Text("🚀 Start in \(countdown)...")
+                            .font(.title2)
+                            .foregroundColor(.green)
+                    } else {
+                        Button("♻️ Rematch jetzt starten") {
+                            startRematchCountdown()
+                        }
+                        .font(.headline)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                }
+            }
+            
+            
             Button(isPlayerReady ? "❌ Bereit zurücknehmen" : "✅ Rematch starten") {
                 firestore.checkIfAllPlayersCanPay(entryFee: einsatzCoins) { success, message in
                     if success {
@@ -336,7 +396,7 @@ struct GameView: View {
             .background(isPlayerReady ? Color.red : Color.blue)
             .foregroundColor(.white)
             .cornerRadius(10)
-
+            
             Button("🚪 Spiel verlassen") {
                 leaveMatch()
             }
@@ -347,12 +407,53 @@ struct GameView: View {
         }
         .padding()
         .onAppear {
-            if let oldEinsatz = firestore.currentGame?.einsatzCoins {
-                self.lastGameWinAmount = oldEinsatz * (firestore.currentGame?.players.count ?? 0)
-                self.einsatzCoins = oldEinsatz
+            print("📱 [GameOverSheet] wird angezeigt – Player: \(playerName), Gewinner: \(winnerName)")
+            if winnerName.isEmpty, let gameId = firestore.currentGame?.id {
+                let docRef = Firestore.firestore().collection("games").document(gameId)
+                docRef.getDocument { snapshot, error in
+                    if let data = snapshot?.data(), let winner = data["winner"] as? String {
+                        winnerName = winner
+                        print("📥 [GameOverSheet] Gewinner nachgeladen (manuell): \(winner)")
+                    }
+                }
             }
-            loadAllPlayerCoinsAndSetMaxEinsatz()
+
+            
+            guard let game = firestore.currentGame else { return }
+            
+            if let oldEinsatz = game.einsatzCoins {
+                self.einsatzCoins = oldEinsatz
+                self.lastGameWinAmount = oldEinsatz * (game.players.count)
+                print("🔁 Einsatz aus Vorpartie: \(oldEinsatz) Münzen")
+            }
+            
             loadMyCurrentCoins()
+            
+            var details: [String] = []
+            var totalChange = 0
+            
+            if let coinDist = game.coinDistribution,
+               let delta = coinDist[playerName] {
+                totalChange += delta
+                if delta > 0 {
+                    details.append("🏆 +\(delta) Münzen gewonnen")
+                } else if delta == einsatzCoins {
+                    details.append("🤝 Einsatz zurück bei Unentschieden")
+                } else {
+                    details.append("❌ \(abs(delta)) Münzen verloren")
+                }
+            }
+            
+            if let scoreBonus = game.scoreBonuses?[playerName], scoreBonus > 0 {
+                totalChange += scoreBonus
+                details.append("📈 +\(scoreBonus) Münzen für deinen Score")
+            }
+            
+            self.coinChangeTotal = totalChange
+            self.coinChangeDetails = details
+            self.bonusCoinsEarned = game.scoreBonuses?[playerName] ?? 0
+            
+            print("📋 Bilanz für \(playerName): \(totalChange) Münzen")
         }
         .onReceive(firestore.$currentGame) { updatedGame in
             if let newEinsatz = updatedGame?.einsatzCoins {
@@ -360,20 +461,20 @@ struct GameView: View {
             }
         }
         .alert(isPresented: $showCoinAlert) {
-            Alert(title: Text("❌ Nicht genug Münzen"),
-                  message: Text(coinAlertMessage),
-                  dismissButton: .default(Text("OK")))
+            Alert(
+                title: Text("❌ Nicht genug Münzen"),
+                message: Text(coinAlertMessage),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
-
-
-
-
-
-
+    
+    
+    
+    
     func togglePlayerReady() {
         guard let gameId = firestore.currentGame?.id else { return }
-
+        
         let ref = Firestore.firestore().collection("games").document(gameId)
         ref.updateData(["rematchReady.\(playerName)": !isPlayerReady]) { error in
             if let error = error {
@@ -396,15 +497,103 @@ struct GameView: View {
             }
         }
     }
+    /*
+    func startRematchCountdown() {
+        guard countdown == nil else { return }
+        countdown = 3
+        
+        print("⏱ [startRematchCountdown] Countdown gestartet")
 
+        countdownTimer?.invalidate()
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if let current = countdown, current > 1 {
+                countdown = current - 1
+            } else {
+                timer.invalidate()
+                countdownTimer = nil
+                countdown = nil
+                if let game = firestore.currentGame,
+                   let gameId = game.id,
+                   game.players.allSatisfy({ game.ready?[$0] == true }),
+                   game.host == playerName {
+
+                    print("✅ [startRematchCountdown] Host startet Rematch nach Countdown")
+                    resetAndStartRematch(for: game.players)
+                }
+            }
+        }
+    }
+     */
+    func startRematchCountdown() {
+        guard countdown == nil else { return }
+        countdown = 3
+
+        print("⏱ [startRematchCountdown] Countdown gestartet")
+
+        countdownTimer?.invalidate()
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if let current = countdown, current > 1 {
+                countdown = current - 1
+            } else {
+                timer.invalidate()
+                countdownTimer = nil
+                countdown = nil
+
+                guard let game = firestore.currentGame,
+                      let gameId = game.id,
+                      game.host == playerName else {
+                    print("❌ [startRematchCountdown] Abbruch – kein gültiges Spiel oder kein Host")
+                    return
+                }
+
+                let allReady = game.players.allSatisfy { game.rematchReady?[$0] == true }
+
+                if allReady {
+                    print("✅ [startRematchCountdown] Alle Spieler bereit – Rematch wird gestartet")
+                    resetAndStartRematch(for: game.players)
+                } else {
+                    print("❌ [startRematchCountdown] Nicht alle Spieler bereit")
+                }
+            }
+        }
+    }
+
+    
+    
+    func resetAndStartRematch(for players: [String]) {
+        print("🔁 [resetAndStartRematch] wird aufgerufen für Spieler: \(players)")
+
+        guard let game = firestore.currentGame,
+              let gameId = game.id else {
+            print("❌ [resetAndStartRematch] Kein gültiges Spielobjekt")
+            return
+        }
+
+        let ref = Firestore.firestore().collection("games").document(gameId)
+
+        print("🔁 [resetAndStartRematch] Starte continueRematchCleanup...")
+
+        continueRematchCleanup(ref: ref, players: players)
+
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            print("🕹️ [resetAndStartRematch] Starte jetzt startGame()...")
+            firestore.startGame()
+        }
+    }
+
+
+    
+    
+    
     
     func loadAllPlayerCoinsAndSetMaxEinsatz() {
         guard let game = firestore.currentGame else { return }
         let usersRef = Firestore.firestore().collection("users")
         var minCoins = Int.max
-
+        
         let dispatchGroup = DispatchGroup()
-
+        
         for player in game.players {
             dispatchGroup.enter()
             usersRef.whereField("username", isEqualTo: player).getDocuments { snapshot, error in
@@ -418,7 +607,7 @@ struct GameView: View {
                 }
             }
         }
-
+        
         dispatchGroup.notify(queue: .main) {
             // Setze den Maximalwert z. B. maximal 20 oder minimaler Coinstand
             let calculatedMax = min(minCoins, 20)
@@ -426,7 +615,7 @@ struct GameView: View {
             self.einsatzCoins = min(self.einsatzCoins, calculatedMax)  // ggf. runterschneiden
         }
     }
-
+    
     func listenForChatUpdates(gameId: String) {
         Firestore.firestore()
             .collection("games")
@@ -436,38 +625,38 @@ struct GameView: View {
             .limit(to: 1)
             .addSnapshotListener { snapshot, _ in
                 guard let doc = snapshot?.documents.first else { return }
-
+                
                 let data = doc.data()
                 let sender = data["sender"] as? String ?? ""
                 let text = data["text"] as? String ?? ""
-
+                
                 if sender != playerName {
                     showMessagePreview(text)
                 }
             }
     }
-
+    
     
     func leaveMatch() {
         guard let game = firestore.currentGame, let gameId = game.id else { return }
         let ref = Firestore.firestore().collection("games").document(gameId)
-
+        
         let myPlayerName = playerName
         let myUID = Auth.auth().currentUser?.uid ?? ""
-
+        
         let roundsRef = Firestore.firestore()
             .collection("games")
             .document(gameId)
             .collection("rounds")
             .whereField("player", isEqualTo: myPlayerName)
-
+        
         roundsRef.getDocuments { snapshot, error in
             guard let docs = snapshot?.documents else {
                 print("⚠️ Keine Runden für \(myPlayerName) gefunden")
                 actuallyLeave(ref: ref, updatedPlayers: game.players.filter { $0 != myPlayerName })
                 return
             }
-
+            
             var scoreDict: [String: Int] = [:]
             for doc in docs {
                 if let cat = doc["category"] as? String,
@@ -475,20 +664,20 @@ struct GameView: View {
                     scoreDict[cat] = pts
                 }
             }
-
+            
             let upper = upperSection.map { scoreDict[$0.0] ?? 0 }.reduce(0, +)
             let lower = lowerSection.map { scoreDict[$0] ?? 0 }.reduce(0, +)
             let bonusThreshold = extraModus ? 84 : 63
             let bonus = upper >= bonusThreshold ? 35 : 0
             let total = upper + lower + bonus
-
+            
             firestore.recordGameForPlayer(playerId: myUID, score: total, extraModus: extraModus)
             print("✅ [LeaveMatch] Mein eigener Spielstand gespeichert: \(total)")
-
+            
             actuallyLeave(ref: ref, updatedPlayers: game.players.filter { $0 != myPlayerName })
         }
     }
-
+    
     private func actuallyLeave(ref: DocumentReference, updatedPlayers: [String]) {
         ref.updateData(["players": updatedPlayers]) { error in
             if let error = error {
@@ -499,17 +688,46 @@ struct GameView: View {
             }
         }
     }
-
-
-
-
+    
+    
+    
+    /*
+     func observeActivePlayer() {
+     guard let game = firestore.currentGame else { return }
+     totalPlayers = game.players.count
+     let gameId = game.id ?? ""
+     
+     let ref = Firestore.firestore().collection("games").document(gameId)
+     
+     ref.getDocument { snapshot, _ in
+     if let data = snapshot?.data(),
+     (data["activePlayer"] as? String)?.isEmpty != false {
+     let firstPlayer = game.players.first ?? ""
+     ref.updateData(["activePlayer": firstPlayer])
+     }
+     }
+     
+     ref.addSnapshotListener { snapshot, _ in
+     if let data = snapshot?.data(),
+     let current = data["activePlayer"] as? String {
+     activePlayer = current
+     if let index = game.players.firstIndex(of: current) {
+     playerTurnIndex = (index - (game.players.firstIndex(of: playerName) ?? 0) + totalPlayers) % totalPlayers
+     }
+     }
+     }
+     }
+     */
+    
+    
     func observeActivePlayer() {
         guard let game = firestore.currentGame else { return }
         totalPlayers = game.players.count
         let gameId = game.id ?? ""
-
+        
         let ref = Firestore.firestore().collection("games").document(gameId)
-
+        
+        // 🔁 Initial: Wenn kein aktiver Spieler gesetzt ist, nimm den ersten
         ref.getDocument { snapshot, _ in
             if let data = snapshot?.data(),
                (data["activePlayer"] as? String)?.isEmpty != false {
@@ -517,44 +735,101 @@ struct GameView: View {
                 ref.updateData(["activePlayer": firstPlayer])
             }
         }
-
+        
+        // 📡 Live-Listener
         ref.addSnapshotListener { snapshot, _ in
-            if let data = snapshot?.data(),
-               let current = data["activePlayer"] as? String {
-                activePlayer = current
-                if let index = game.players.firstIndex(of: current) {
-                    playerTurnIndex = (index - (game.players.firstIndex(of: playerName) ?? 0) + totalPlayers) % totalPlayers
-                }
+            guard let data = snapshot?.data(),
+                  let current = data["activePlayer"] as? String else { return }
+            
+            activePlayer = current
+            
+            if let myIndex = game.players.firstIndex(of: playerName),
+               let currentIndex = game.players.firstIndex(of: current) {
+                playerTurnIndex = (currentIndex - myIndex + game.players.count) % game.players.count
             }
+            
+            print("🎯 Aktiver Spieler laut Firestore: \(current)")
+            print("🤖 Ich bin: \(playerName), mein TurnIndex: \(playerTurnIndex)")
         }
     }
     
+    
     func showMessagePreview(_ message: String) {
         lastMessagePreview = message
-
-        previewTimer?.invalidate() // Vorherigen Timer stoppen
+        
+        previewTimer?.invalidate()
         previewTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
             lastMessagePreview = nil
         }
     }
+    
+    /*
+    func observeGameOver() {
+        guard let gameId = firestore.currentGame?.id else { return }
+        
+        let ref = Firestore.firestore().collection("games").document(gameId)
+        
+        ref.addSnapshotListener { snapshot, _ in
+            guard let data = snapshot?.data(),
+                  let isOver = data["gameOver"] as? Bool,
+                  isOver else { return }
+            
+            winnerName = data["winner"] as? String ?? "?"
+            winnerPoints = data["winnerScore"] as? Int ?? 0
+            showGameOverSheet = true
+        }
+    }
+    
+    func observeGameOver() { //aktueller als die oberer
+        guard let gameId = firestore.currentGame?.id else { return }
 
+        let ref = Firestore.firestore().collection("games").document(gameId)
 
+        ref.addSnapshotListener { snapshot, _ in
+            guard let data = snapshot?.data() else { return }
+
+            let isOver = data["gameOver"] as? Bool ?? false
+
+            if isOver && !showGameOverSheet && !didCloseRematchSheet {
+                print("🏁 [observeGameOver] Spiel ist vorbei – GameOverSheet wird angezeigt")
+                winnerName = data["winner"] as? String ?? "?"
+                winnerPoints = data["winnerScore"] as? Int ?? 0
+                showGameOverSheet = true
+            }else if isOver && didCloseRematchSheet {
+                print("🛑 [observeGameOver] Spiel ist vorbei, aber wurde schon für Rematch zurückgesetzt")
+            }
+        }
+    }
+     */
     func observeGameOver() {
         guard let gameId = firestore.currentGame?.id else { return }
 
         let ref = Firestore.firestore().collection("games").document(gameId)
 
         ref.addSnapshotListener { snapshot, _ in
-            guard let data = snapshot?.data(),
-                  let isOver = data["gameOver"] as? Bool,
-                  isOver else { return }
+            guard let data = snapshot?.data() else { return }
 
-            winnerName = data["winner"] as? String ?? "?"
-            winnerPoints = data["winnerScore"] as? Int ?? 0
-            showGameOverSheet = true
+            let isOver = data["gameOver"] as? Bool ?? false
+            let winner = data["winner"] as? String ?? "?"
+            let winnerScore = data["winnerScore"] as? Int ?? 0
+
+            print("👀 [observeGameOver] isOver=\(isOver), showGameOverSheet=\(showGameOverSheet), didCloseRematchSheet=\(didCloseRematchSheet)")
+
+            if isOver && !showGameOverSheet {
+                print("🏁 [observeGameOver] Spiel ist vorbei – GameOverSheet wird angezeigt (auch wenn didCloseRematchSheet true ist)")
+                winnerName = winner
+                winnerPoints = winnerScore
+                showGameOverSheet = true
+                didCloseRematchSheet = false
+            }
         }
     }
 
+
+
+
+    
+    
     func advanceTurn() {
         guard let game = firestore.currentGame, let gameId = game.id else { return }
         if let index = game.players.firstIndex(of: activePlayer) {
@@ -576,177 +851,235 @@ struct GameView: View {
                 let data = doc.data()
                 let sender = data["sender"] as? String ?? ""
                 let text = data["text"] as? String ?? ""
-
+                
                 if sender != playerName {
                     showMessagePreview(text)
                 }
             }
     }
-
-
+    
+    
     func checkForGameEnd() {
-        guard let gameId = firestore.currentGame?.id else { return }
-
+        guard let game = firestore.currentGame,
+              let gameId = game.id else { return }
+        
         Firestore.firestore()
             .collection("games")
             .document(gameId)
             .collection("rounds")
             .getDocuments { snapshot, _ in
                 guard let docs = snapshot?.documents else { return }
-
+                
                 let grouped = Dictionary(grouping: docs, by: { $0["player"] as? String ?? "" })
-                guard !grouped.isEmpty else { return }
-
                 let requiredCategoryCount = upperSection.count + lowerSection.count
+                //let requiredCategoryCount = 1
+
+                
+                // Nur beenden, wenn ALLE Spieler alle Runden gespielt haben
+                let allPresent = Set(game.players).isSubset(of: Set(grouped.keys))
                 let allFinished = grouped.values.allSatisfy { $0.count >= requiredCategoryCount }
 
-                if allFinished {
-                    var bestScore = Int.min
-                    var bestPlayers: [String] = []
+                guard allPresent && allFinished else { return }
 
-                    for (player, entries) in grouped {
-                        var scoreDict: [String: Int] = [:]
-                        for doc in entries {
-                            if let cat = doc["category"] as? String,
-                               let pts = doc["score"] as? Int {
-                                scoreDict[cat] = pts
-                            }
-                        }
-
-                        let upper = upperSection.map { scoreDict[$0.0] ?? 0 }.reduce(0, +)
-                        let lower = lowerSection.map { scoreDict[$0] ?? 0 }.reduce(0, +)
-                        let bonusThreshold = extraModus ? 84 : 63
-                        let bonus = upper >= bonusThreshold ? 35 : 0
-                        let total = upper + lower + bonus
-
-                        print("✅ Spieler \(player): Upper=\(upper), Lower=\(lower), Bonus=\(bonus), Total=\(total)")
-
-                        firestore.endGame(for: player, finalScore: total)
-
-                        if total > bestScore {
-                            bestScore = total
-                            bestPlayers = [player]
-                        } else if total == bestScore {
-                            bestPlayers.append(player)
-                        }
-
-                        // Bonus-Coins für persönliche Leistung
-                        let usersRef = Firestore.firestore().collection("users")
-                        usersRef.whereField("username", isEqualTo: player).getDocuments { snapshot, error in
-                            if let error = error {
-                                print("❌ Fehler beim Finden des Users \(player): \(error.localizedDescription)")
-                                return
-                            }
-                            guard let doc = snapshot?.documents.first else {
-                                print("⚠️ Kein User-Dokument für Spieler \(player) gefunden")
-                                return
-                            }
-                            let playerId = doc.documentID
-                            firestore.rewardCoinsForScore(playerId: playerId, score: total, extraModus: extraModus)
+                
+                var bestScore = Int.min
+                var bestPlayers: [String] = []
+                var coinDistribution: [String: Int] = [:]
+                var scoreBonuses: [String: Int] = [:]
+                
+                let entryFee = game.einsatzCoins ?? 0
+                let playerCount = game.players.count
+                let totalPot = entryFee * playerCount
+                let thresholds = game.extraModus == true ? firestore.rewardThresholdsErweitert : firestore.rewardThresholdsStandard
+                
+                // Score-Berechnung und Bonusvergabe
+                for (player, entries) in grouped {
+                    var scores: [String: Int] = [:]
+                    for doc in entries {
+                        if let cat = doc["category"] as? String,
+                           let pts = doc["score"] as? Int {
+                            scores[cat] = pts
                         }
                     }
-
-                    let entryFee = firestore.currentGame?.einsatzCoins ?? 0
-                    let totalPlayers = grouped.keys.count
-
-                    let ref = Firestore.firestore().collection("games").document(gameId)
-                    ref.updateData([
-                        "gameOver": true,
-                        "winner": bestPlayers.first ?? "",
-                        "winnerScore": bestScore
-                    ])
-
-                    let usersRef = Firestore.firestore().collection("users")
-
-                    if bestPlayers.count > 1 {
-                        // Unentschieden → allen den Einsatz zurückzahlen
-                        for player in bestPlayers {
-                            usersRef.whereField("username", isEqualTo: player).getDocuments { snapshot, error in
-                                if let doc = snapshot?.documents.first {
-                                    let playerId = doc.documentID
-                                    firestore.addCoinsToPlayer(playerId: playerId, coins: entryFee)
-                                    print("🤝 Unentschieden: Einsatz an \(player) zurückgegeben")
-                                }
-                            }
-                        }
-                    } else if let winner = bestPlayers.first {
-                        // Gewinner → ganzen Pot auszahlen
-                        firestore.distributeWinnerCoins(winnerName: winner, totalPlayers: totalPlayers, entryFee: entryFee)
-
-                        // Highscore nur für Gewinner speichern
-                        let highscoreRef = Firestore.firestore().collection("highscores")
-                        highscoreRef.addDocument(data: [
-                            "playerName": winner,
-                            "score": bestScore,
-                            "timestamp": Timestamp(date: Date()),
-                            "modus": extraModus ? "erweitert" : "standard"
-                        ])
+                    
+                    let upper = upperSection.map { scores[$0.0] ?? 0 }.reduce(0, +)
+                    let lower = lowerSection.map { scores[$0] ?? 0 }.reduce(0, +)
+                    let bonus = (upper >= (game.extraModus == true ? 84 : 63)) ? 35 : 0
+                    let total = upper + lower + bonus
+                    
+                    firestore.endGame(for: player, finalScore: total)
+                    
+                    // Score-Bonus bestimmen
+                    let bonusCoins = thresholds.first(where: { total > $0.score })?.coins ?? 0
+                    scoreBonuses[player] = bonusCoins
+                    
+                    // Beste(r) Spieler
+                    if total > bestScore {
+                        bestScore = total
+                        bestPlayers = [player]
+                    } else if total == bestScore {
+                        bestPlayers.append(player)
                     }
                 }
+                
+                // Pot-Verteilung
+                if bestPlayers.count > 1 {
+                    let share = totalPot / bestPlayers.count
+                    for player in bestPlayers {
+                        coinDistribution[player] = share
+                    }
+                } else if let winner = bestPlayers.first {
+                    coinDistribution[winner] = totalPot
+                }
+                
+                // Speicherung in Firestore
+                let ref = Firestore.firestore().collection("games").document(gameId)
+                ref.updateData([
+                    "gameOver": true,
+                    "winner": bestPlayers.first ?? "",
+                    "winnerScore": bestScore,
+                    "coinDistribution": coinDistribution,
+                    "scoreBonuses": scoreBonuses
+                ])
+                
+                // Auszahlung an Spieler
+                let usersRef = Firestore.firestore().collection("users")
+                let allPlayers = Set(coinDistribution.keys).union(scoreBonuses.keys)
+                
+                for player in allPlayers {
+                    let win = coinDistribution[player] ?? 0
+                    let bonus = scoreBonuses[player] ?? 0
+                    let totalCoins = win + bonus
+                    guard totalCoins > 0 else { continue }
+                    
+                    usersRef.whereField("username", isEqualTo: player).getDocuments { snapshot, _ in
+                        guard let doc = snapshot?.documents.first else { return }
+                        let playerId = doc.documentID
+                        firestore.addCoinsToPlayer(playerId: playerId, coins: totalCoins, reason: "Gewinn: \(win) + Bonus: \(bonus)")
+                    }
+                }
+                
+                print("✅ Spiel abgeschlossen mit Pot \(totalPot), Gewinner: \(bestPlayers.joined(separator: ", "))")
             }
     }
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     func markPlayerReadyForRematch() {
         guard let gameId = firestore.currentGame?.id else { return }
-
+        
         let ref = Firestore.firestore().collection("games").document(gameId)
         ref.updateData(["rematchReady.\(playerName)": true])
     }
 
     func observeRematchStatus() {
-        guard let game = firestore.currentGame, let gameId = game.id else { return }
+        guard let game = firestore.currentGame,
+              let gameId = game.id else { return }
+
         let ref = Firestore.firestore().collection("games").document(gameId)
 
         ref.addSnapshotListener { snapshot, _ in
-            guard let data = snapshot?.data(),
-                  let rematchDict = data["rematchReady"] as? [String: Bool] else { return }
+            guard let data = snapshot?.data() else { return }
 
-            let readyCount = rematchDict.filter { $0.value }.count
-            rematchReadyCount = readyCount
+            if let rematchDict = data["rematchReady"] as? [String: Bool] {
+                let readyCount = rematchDict.filter { $0.value }.count
+                rematchReadyCount = readyCount
+            }
 
-            let allReady = game.players.allSatisfy { rematchDict[$0] == true }
-
-            if allReady {
-                print("♻️ Alle Spieler bereit – Rematch startet")
-
-                // Jeder Client verarbeitet nur seine eigenen Daten
-                let myPlayerName = playerName
-                let myUID = Auth.auth().currentUser?.uid ?? ""
-
-                ref.collection("rounds")
-                    .whereField("player", isEqualTo: myPlayerName)
-                    .getDocuments { snapshot, error in
-                        guard let docs = snapshot?.documents else {
-                            print("⚠️ Keine Runden für \(myPlayerName) gefunden")
-                            continueRematchCleanup(ref: ref, players: game.players)
-                            return
+            if let gameOver = data["gameOver"] as? Bool, gameOver == false {
+                // Reset bei neuem Spiel
+                if showGameOverSheet {
+                    print("✅ [observeRematchStatus] gameOver == false und Sheet ist offen – schließen")
+                    resetGameState()
+                    showGameOverSheet = false
+                    didCloseRematchSheet = true
+                    isPlayerReady = false
+                } else if !didCloseRematchSheet && winnerName != "" {
+                    // Fallback nur auslösen, wenn winnerName bereits gesetzt war → dann aber sicher resetten
+                    print("🛠️ [observeRematchStatus] Fallback-Reset nach 2s, warte auf mögliches Sheet")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        if !showGameOverSheet {
+                            print("🛠️ [observeRematchStatus] Fallback aktiv – kein Sheet nach 2s → Reset")
+                            resetGameState()
+                            didCloseRematchSheet = true
+                            isPlayerReady = false
+                        } else {
+                            print("ℹ️ [observeRematchStatus] Sheet ist inzwischen sichtbar – kein Fallback nötig")
                         }
-
-                        var scoreDict: [String: Int] = [:]
-                        for doc in docs {
-                            if let cat = doc["category"] as? String,
-                               let pts = doc["score"] as? Int {
-                                scoreDict[cat] = pts
-                            }
-                        }
-
-                        let upper = upperSection.map { scoreDict[$0.0] ?? 0 }.reduce(0, +)
-                        let lower = lowerSection.map { scoreDict[$0] ?? 0 }.reduce(0, +)
-                        let bonusThreshold = extraModus ? 84 : 63
-                        let bonus = upper >= bonusThreshold ? 35 : 0
-                        let total = upper + lower + bonus
-
-                        firestore.recordGameForPlayer(playerId: myUID, score: total, extraModus: extraModus)
-                        print("✅ [Rematch] Mein eigener Spielstand gespeichert: \(total)")
-
-                        continueRematchCleanup(ref: ref, players: game.players)
                     }
+                } else {
+                    print("⚠️ [observeRematchStatus] Kein Reset – warte auf GameOver oder Sheet")
+                }
             }
         }
     }
 
-    // Hilfsfunktion: Cleanup einmalig durchführen (nur Host oder erster Aufrufer macht das)
+
+    
+    
+    
+    
+    
+    
+    /*
+    private func continueRematchCleanup(ref: DocumentReference, players: [String]) {
+        let entryFee = einsatzCoins
+        
+        firestore.collectEntryFeeFromAllPlayers(entryFee: entryFee) { success, message in
+            if success {
+                ref.collection("rounds").getDocuments { snapshot, _ in
+                    let allRounds = snapshot?.documents ?? []
+                    for round in allRounds {
+                        round.reference.delete()
+                    }
+                    print("🗑 [Rematch] Alte Runden gelöscht")
+                    
+                    // Firestore zurücksetzen
+                    ref.updateData([
+                        "rematchReady": FieldValue.delete(),
+                        "gameOver": false,
+                        "winner": FieldValue.delete(),
+                        "winnerScore": FieldValue.delete(),
+                        "activePlayer": players.first ?? "",
+                        "coinDistribution": FieldValue.delete(),
+                        "scoreBonuses": FieldValue.delete(),
+                        "einsatzBezahlt": false,
+                        "started": false
+                    ]) { error in
+                        if let error = error {
+                            print("❌ Fehler beim Reset: \(error.localizedDescription)")
+                        } else {
+                            print("✅ [Rematch] Zurückgesetzt")
+                        }
+                    }
+                    
+                    // ❗ Spieler-Ready explizit zurücksetzen
+                    for player in players {
+                        ref.updateData([
+                            "ready.\(player)": false
+                        ])
+                    }
+                    
+                    // Lokale Zustände
+                    DispatchQueue.main.async {
+                        self.resetGameState()
+                        self.isPlayerReady = false
+                        self.didCloseRematchSheet = false
+                    }
+                }
+            } else {
+                print("❌ Einsatz konnte nicht eingezogen werden: \(message ?? "Unbekannt")")
+            }
+        }
+    }
+     */
     private func continueRematchCleanup(ref: DocumentReference, players: [String]) {
         let entryFee = einsatzCoins
 
@@ -754,54 +1087,97 @@ struct GameView: View {
             if success {
                 ref.collection("rounds").getDocuments { snapshot, _ in
                     let allRounds = snapshot?.documents ?? []
-                    allRounds.forEach { $0.reference.delete() }
-                    print("🗑 [Rematch] Alte Runden in Firestore gelöscht")
+                    for round in allRounds {
+                        round.reference.delete()
+                    }
+                    print("🗑 [Rematch] Alte Runden gelöscht")
 
+                    // Firestore-Daten zurücksetzen
                     ref.updateData([
                         "rematchReady": FieldValue.delete(),
                         "gameOver": false,
                         "winner": FieldValue.delete(),
                         "winnerScore": FieldValue.delete(),
-                        "activePlayer": players.first ?? ""
+                        "activePlayer": players.first ?? "",
+                        "coinDistribution": FieldValue.delete(),
+                        "scoreBonuses": FieldValue.delete(),
+                        "einsatzBezahlt": false,
+                        "started": false
                     ]) { error in
                         if let error = error {
-                            print("❌ Fehler beim Zurücksetzen des Spiels: \(error.localizedDescription)")
+                            print("❌ Fehler beim Reset: \(error.localizedDescription)")
                         } else {
-                            print("✅ [Rematch] Spiel in Firestore erfolgreich zurückgesetzt")
+                            print("✅ [Rematch] Zurückgesetzt")
                         }
                     }
 
-                    resetGameState()
-                    print("🔄 [Rematch] Lokaler Spielzustand zurückgesetzt")
+                    // ✅ Lokale Zustände
+                    DispatchQueue.main.async {
+                        self.resetGameState()
+                        self.isPlayerReady = false
+                        self.didCloseRematchSheet = false
+                    }
                 }
             } else {
-                print("❌ Einsatz konnte nicht eingezogen werden: \(message ?? "Unbekanntes Problem")")
-                // Optional: zeige hier ein Alert oder Hinweis
+                print("❌ Einsatz konnte nicht eingezogen werden: \(message ?? "Unbekannt")")
             }
         }
     }
 
-
-
-
-
-
-
+    
+    
+    /*
+     func resetGameState() {
+     usedCategories = []
+     categoryScores = [:]
+     dice = Array(repeating: 0, count: 5)
+     holds = Array(repeating: false, count: 5)
+     rollsLeft = 3
+     firstRollDone = false
+     showGameOverSheet = false
+     let count = extraModus ? 6 : 5
+     dice = Array(repeating: 0, count: count)
+     holds = Array(repeating: false, count: count)
+     
+     
+     }
+     }
+     */
     func resetGameState() {
+        print("🔄 [resetGameState] Lokaler Spielzustand wird zurückgesetzt")
         usedCategories = []
         categoryScores = [:]
-        dice = Array(repeating: 0, count: 5)
-        holds = Array(repeating: false, count: 5)
-        rollsLeft = 3
-        firstRollDone = false
-        showGameOverSheet = false
+        bonusCoinsEarned = 0
+        coinChangeTotal = 0
+        coinChangeDetails = []
+        winnerName = ""
+        winnerPoints = 0
+        isPlayerReady = false
+        didCloseRematchSheet = false
+
         let count = extraModus ? 6 : 5
         dice = Array(repeating: 0, count: count)
         holds = Array(repeating: false, count: count)
+        rollsLeft = 3
+        firstRollDone = false
 
-        
+        showGameOverSheet = false
+        showDiceView = false
+        showScoreboard = false
+        showChat = false
+        animateReady = false
+        rematchReadyCount = 0
+        countdown = nil
+        countdownTimer?.invalidate()
+        countdownTimer = nil
+
+        activePlayer = ""
+        playerTurnIndex = 0
+
+        observeActivePlayer()
     }
 }
+
 
 struct ScoreCard: View {
     let title: String
@@ -893,7 +1269,8 @@ struct DiceRollingView: View {
     var onRoundComplete: (String, Int) -> Void
     @State private var selectedOption: String = ""
     @State private var scoreMap: [String: Int] = [:]
-
+    
+    
     var options: [String] {
         var base = [
             "Nur Einser zählen", "Nur Zweier zählen", "Nur Dreier zählen",
@@ -910,6 +1287,9 @@ struct DiceRollingView: View {
         base.append("Kniraffel")
         return base
     }
+    
+    
+    
 
     var canSubmitRound: Bool {
         !selectedOption.isEmpty &&
@@ -1076,6 +1456,8 @@ struct DiceRollingView: View {
             fullImageName = String(format: "platin_%02d", value)
         } else if skin == "kniraffel" {
             fullImageName = String(format: "kniraffel_%02d", value)
+        }else if skin == "love" {
+            fullImageName = String(format: "love_%02d", value)
         } else if skin == "duempeldorf" {
             fullImageName = String(format: "duempeldorf_%02d", value)
         } else {

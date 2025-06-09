@@ -10,7 +10,7 @@ class SoundEffectManager {
     func playButtonSound() {
         let isEnabled = UserDefaults.standard.bool(forKey: "buttonSoundEnabled")
         guard isEnabled else {
-            print("🔕 Button-Sound deaktiviert")
+            //print("🔕 Button-Sound deaktiviert")
             return
         }
 
@@ -21,7 +21,7 @@ class SoundEffectManager {
     func playDiceSound() {
         let isEnabled = UserDefaults.standard.bool(forKey: "buttonSoundEnabled")
         guard isEnabled else {
-            print("🎲 Würfel-Sound deaktiviert")
+            //print("🎲 Würfel-Sound deaktiviert")
             return
         }
 

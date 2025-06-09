@@ -18,7 +18,9 @@ let availableSkins = [
     DiceSkin(name: "🪵 Holz", price: 300, previewImage: "holz_preview", skinKey: "holz"),
     DiceSkin(name: "💍 Platin", price: 300, previewImage: "platin_preview", skinKey: "platin"),
     DiceSkin(name: "🦒 Kniraffel", price: 1000, previewImage: "kniraffel_preview", skinKey: "kniraffel"),
-    DiceSkin(name: "⚽️ Duempeldorf", price: 1000, previewImage: "duempeldorf_preview", skinKey: "duempeldorf")
+    DiceSkin(name: "⚽️ Duempeldorf", price: 1000, previewImage: "duempeldorf_preview", skinKey: "duempeldorf"),
+    DiceSkin(name: "❤️ Love", price: -1, previewImage: "love_preview", skinKey: "love")
+
 
 
 ]
@@ -30,8 +32,9 @@ struct ShopView: View {
     @State private var cart: [DiceSkin] = []
     @State private var errorMessage: String? = nil
     @State private var showInfo: Bool = false
+    @State private var foodAmountInCart: Int = 0
 
-    // FirestoreManager-Instanz für Bonus-Infos
+
     let firestoreManager = FirestoreManager()
 
     var body: some View {
@@ -43,12 +46,23 @@ struct ShopView: View {
 
                 Text("🏦 Deine Münzen: \(currentCoins)")
                     .font(.headline)
+                
 
                 Button(action: { showInfo.toggle() }) {
                     Label("Wie bekomme ich Münzen?", systemImage: "info.circle")
                         .font(.subheadline)
                         .foregroundColor(.blue)
                 }
+                
+                HStack {
+                    Stepper("🌾 Futter: \(foodAmountInCart)", value: $foodAmountInCart, in: 0...99)
+                    Spacer()
+                    Text("\(foodAmountInCart * 5) Münzen")
+                        .foregroundColor(.orange)
+                }
+                .padding(.horizontal)
+
+
 
                 if showInfo {
                     ScrollView {
@@ -122,19 +136,23 @@ struct ShopView: View {
                             SkinSelectButton(isActive: selectedSkin == skin.skinKey) {
                                 selectSkin(skin: skin)
                             }
-                        } else {
+                        } else if skin.price > 0 {
                             Button(action: {
                                 toggleCart(skin: skin)
                             }) {
                                 Text(cart.contains(where: { $0.id == skin.id }) ? "Entfernen" : "In Warenkorb")
                                     .foregroundColor(.orange)
                             }
+                        } else {
+                            Text("🔒 Nur durch Freischalten")
+                                .font(.caption)
+                                .foregroundColor(.gray)
                         }
                     }
                     .padding(.vertical, 6)
                 }
 
-                if !cart.isEmpty {
+                if !cart.isEmpty || foodAmountInCart > 0 {
                     VStack(spacing: 10) {
                         Text("🛍️ Warenkorb")
                             .font(.headline)
@@ -143,7 +161,12 @@ struct ShopView: View {
                             Text("• \(skin.name) – \(skin.price) Münzen")
                         }
 
-                        let totalCost = cart.map { $0.price }.reduce(0, +)
+                        if foodAmountInCart > 0 {
+                            Text("• 🌾 Futter × \(foodAmountInCart) – \(foodAmountInCart * 5) Münzen")
+                        }
+
+                        let totalCost = cart.map { $0.price }.reduce(0, +) + (foodAmountInCart * 5)
+
                         Text("Gesamt: \(totalCost) Münzen")
                             .bold()
 
@@ -159,6 +182,7 @@ struct ShopView: View {
                     .background(Color(.systemGray6))
                     .cornerRadius(12)
                 }
+
 
                 Spacer()
             }
@@ -186,6 +210,29 @@ struct ShopView: View {
             }
         }
     }
+    
+    func buyFood() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        if currentCoins < 10 {
+            errorMessage = "❌ Nicht genug Münzen für Futter."
+            return
+        }
+
+        let userRef = Firestore.firestore().collection("users").document(userId)
+        userRef.updateData([
+            "coins": FieldValue.increment(Int64(-5))
+        ]) { error in
+            if let error = error {
+                errorMessage = "❌ Fehler beim Bezahlen: \(error.localizedDescription)"
+            } else {
+                FirestoreManager().addItemToInventory(for: userId, item: "stroh")
+                currentCoins -= 5
+                errorMessage = nil
+            }
+        }
+    }
+
 
     func toggleCart(skin: DiceSkin) {
         if let index = cart.firstIndex(where: { $0.id == skin.id }) {
@@ -197,7 +244,9 @@ struct ShopView: View {
 
     func buyCart(totalCost: Int) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
-        let skinIds = cart.map { $0.skinKey }
+
+        let skinIds = cart.filter { $0.price > 0 }.map { $0.skinKey }
+
 
         if totalCost > currentCoins {
             let missing = totalCost - currentCoins
@@ -213,17 +262,23 @@ struct ShopView: View {
             "purchasedSkins": updatedPurchased
         ]) { error in
             if let error = error {
-                print("❌ Fehler beim Kauf: \(error.localizedDescription)")
                 errorMessage = "❌ Fehler beim Kauf: \(error.localizedDescription)"
             } else {
-                print("✅ Kauf abgeschlossen")
                 self.currentCoins -= totalCost
                 self.purchasedSkins = updatedPurchased
                 self.cart = []
                 self.errorMessage = nil
+
+                if foodAmountInCart > 0 {
+                    for _ in 0..<foodAmountInCart {
+                        firestoreManager.addItemToInventory(for: userId, item: "stroh")
+                    }
+                    foodAmountInCart = 0
+                }
             }
         }
     }
+
 
     func selectSkin(skin: DiceSkin) {
         guard let userId = Auth.auth().currentUser?.uid else { return }

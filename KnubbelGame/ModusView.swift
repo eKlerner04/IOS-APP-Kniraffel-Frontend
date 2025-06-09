@@ -31,43 +31,46 @@ struct ModusView: View {
                     ))
 
                     if isHost {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("💰 Einsatz pro Spieler: \(einsatzCoins) Münzen")
-                            Slider(value: Binding(
-                                get: { Double(einsatzCoins) },
-                                set: { newValue in
-                                    einsatzCoins = Int(newValue)
-                                    if let gameID = firestore.currentGame?.id {
-                                        // Nur Host darf setzen!
-                                        if isHost {
+                        if let playerCount = firestore.currentGame?.players.count, playerCount > 1 {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("💰 Einsatz pro Spieler: \(einsatzCoins) Münzen")
+                                Slider(value: Binding(
+                                    get: { Double(einsatzCoins) },
+                                    set: { newValue in
+                                        einsatzCoins = Int(newValue)
+                                        if let gameID = firestore.currentGame?.id {
                                             Firestore.firestore().collection("games").document(gameID)
                                                 .updateData(["einsatzCoins": einsatzCoins])
                                             print("✅ Host hat Einsatz auf \(einsatzCoins) gesetzt")
-                                        } else {
-                                            print("⚠️ Kein Host, Änderung blockiert")
                                         }
                                     }
-                                }
-                            ), in: 0...20, step: 1)
-                        }
-                        .padding(.vertical)
-                        
-                        Button("✅ Überprüfen, ob alle genug Münzen haben") {
-                            firestore.checkIfAllPlayersCanPay(entryFee: einsatzCoins) { success, message in
-                                einsatzCheckResult = message
+                                ), in: 0...20, step: 1)
                             }
-                        }
-                        .padding(.top, 8)
-                        
-                        if let result = einsatzCheckResult {
-                            Text(result)
+                            .padding(.vertical)
+                            
+                            Button("✅ Überprüfen, ob alle genug Münzen haben") {
+                                firestore.checkIfAllPlayersCanPay(entryFee: einsatzCoins) { success, message in
+                                    einsatzCheckResult = message
+                                }
+                            }
+                            .padding(.top, 8)
+                            
+                            if let result = einsatzCheckResult {
+                                Text(result)
+                                    .font(.footnote)
+                                    .foregroundColor(successColor(from: result))
+                            }
+                        } else {
+                            Text("🧍 Einzelspiel – kein Einsatz möglich")
                                 .font(.footnote)
-                                .foregroundColor(successColor(from: result))
+                                .foregroundColor(.gray)
+                                .padding(.vertical)
                         }
                     } else {
-                        Text("Nur der Host kann diese Optionen ändern.").font(.footnote).foregroundColor(.gray)
+                        Text("Nur der Host kann diese Optionen ändern.")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
                     }
-
                 }
             }
             .navigationTitle("⚙️ Einstellungen")
@@ -82,7 +85,7 @@ struct ModusView: View {
     var isHost: Bool {
         firestore.currentGame?.host == playerName
     }
-    
+
     func successColor(from message: String) -> Color {
         message.contains("✔") ? .green : .red
     }

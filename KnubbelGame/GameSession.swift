@@ -14,4 +14,9 @@ struct GameSession: Codable, Identifiable {
     var modus: String?
     var einsatzCoins: Int?  // optional für rückwärtskompatibel
     var ready: [String: Bool]? = nil
+    var coinDistribution: [String: Int]? = nil
+    var scoreBonuses: [String: Int]? // optional
+    var einsatzBezahlt: Bool = false
+    var rematchReady: [String: Bool]?
+
 }

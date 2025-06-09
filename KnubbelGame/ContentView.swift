@@ -8,6 +8,8 @@ extension Notification.Name {
 
 struct ContentView: View {
     @StateObject var firestore = FirestoreManager()
+    @State private var showTamagotchiView = false
+
     @State private var gameCode: String = ""
     @State private var showLobby = false
     @State private var isInGame = false
@@ -27,8 +29,8 @@ struct ContentView: View {
     @State private var requiredVersion = ""
     @State private var currentCoins: Int = 0
     @State private var showShop = false
-
-
+    @State private var showDebugTestView = false
+    @State private var showMultiDebug = false
 
     var body: some View {
         NavigationStack {
@@ -106,15 +108,32 @@ struct ContentView: View {
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(OutlinedButtonStyle())
+                            
 
-                            Button(action: {
-                                showSettingsSheet = true
-                            }) {
-                                Image(systemName: "gear")
-                                    .font(.title2)
-                                    .padding(8)
+
+                            HStack(spacing: 16) {
+                                Button(action: {
+                                    showTamagotchiView = true
+                                }) {
+                                    Image("KniraffelKopf")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 24, height: 24)
+                                        .padding(8)
+
+                                }
+                                .buttonStyle(PlainButtonStyle())
+
+                                Button(action: {
+                                    showSettingsSheet = true
+                                }) {
+                                    Image(systemName: "gear")
+                                        .font(.title2)
+                                        .padding(8)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
-                            .buttonStyle(PlainButtonStyle())
+
                             
                             
 
@@ -155,12 +174,23 @@ struct ContentView: View {
             .sheet(isPresented: $showProfileSheet) {
                 ProfileView()
             }
+            .sheet(isPresented: $showTamagotchiView) {
+                TamagotchiView()
+            }
             .sheet(isPresented: $showSettingsSheet) {
                 SettingsView()
             }
             .sheet(isPresented: $showShop) {
                 ShopView()
             }
+            .sheet(isPresented: $showDebugTestView) {
+                DebugTestView()
+            }
+            .sheet(isPresented: $showMultiDebug) {
+                MultiPlayerDebugView()
+            }
+
+
 
             .onAppear {
                 firestore.resetJoinStatus()
@@ -287,18 +317,14 @@ struct ContentView: View {
     // MARK: - Button Actions
 
     private func handleCreateLobby() {
-        playerName = tempName.isEmpty ? playerName : tempName
-        finalName = playerName.isEmpty ? "Player \(Int.random(in: 100...999))" : playerName
+        finalName = playerName
         firestore.createNewGame(playerName: finalName)
         showLobby = true
-        playerName = finalName
     }
 
     private func handleJoinLobby() {
-        playerName = tempName.isEmpty ? playerName : tempName
-        finalName = playerName.isEmpty ? "Player \(Int.random(in: 100...999))" : playerName
+        finalName = playerName
         let code = gameCode.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        playerName = finalName
 
         guard !code.isEmpty else {
             firestore.joinError = "Bitte gib einen gültigen Code ein."
@@ -315,6 +341,7 @@ struct ContentView: View {
             }
         }
     }
+
 
     // ... (deine bestehenden Funktionen: loadHighscores, loadTopUserScores, loadUsernameIfNeeded) ...
     func loadHighscores() {
